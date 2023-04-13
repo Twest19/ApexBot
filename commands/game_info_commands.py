@@ -61,3 +61,4 @@ class GameInfoCommands(commands.Cog):
             await ctx.send(response)
         else:
             await ctx.send(f"Error: Unable to server status, please try again.")
+
