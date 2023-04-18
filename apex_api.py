@@ -22,7 +22,7 @@ class ApexAPI:
         return self.__get_code_response(response)
 
     def map_rotation(self):
-        current_rotation = f"{self.base_url}maprotation?auth={self.key}"
+        current_rotation = f"{self.base_url}maprotation?auth={self.key}&version=2"
         response = requests.get(current_rotation)
 
         return self.__get_code_response(response)
