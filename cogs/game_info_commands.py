@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from apex_api import ApexAPI
 from discord import app_commands
+from formatter.bot_response_formatter import BotResponseFormatter
 
 
 class GameInfoCommands(commands.Cog):
@@ -14,38 +15,22 @@ class GameInfoCommands(commands.Cog):
         current_maps = self.apex_api.map_rotation()
 
         if current_maps is not None:
-            br_current = current_maps['battle_royale']['current']['map']
-            br_next_map = current_maps['battle_royale']['next']['map']
-
-            ranked_map = current_maps['ranked']['current']['map']
-            ranked_map_timer = current_maps['ranked']['current']['remainingTimer']
-
-            ranked_next = current_maps['ranked']['next']['map']
-            ranked_next_begins = current_maps['ranked']['next']['readableDate_start']
-
-            response = f"BR:" \
-                       f"\n\tCurrent: {br_current}" \
-                       f"\n\tNext: {br_next_map}" \
-                       f"\n\nRanked:" \
-                       f"\n\tCurrent: {ranked_map} \n\tRemaining Time: {ranked_map_timer}\n" \
-                       f"\n\tNext: {ranked_next} \n\tBegins: {ranked_next_begins}"
-            print("Here?")
-            await interaction.response.send_message(content=response)
-            print("Here2")
+            embed_response = BotResponseFormatter.map_formatter(current_maps)
+            await interaction.response.send_message(embed=embed_response)
         else:
-            await interaction.response.send_message(content=f"Error: Unable to retrieve current map rotation, please try again.")
+            await interaction.response.send_message(
+                content=f"Error: Unable to retrieve current map rotation, please try again.")
 
     @app_commands.command(name="crafter", description="Displays current crafting rotation.")
     async def crafter(self, interaction: discord.Interaction):
         crafting_rotation = self.apex_api.crafting_rotation()
 
         if crafting_rotation is not None:
-            response = "\n"
-            for item in crafting_rotation:
-                response += f"{item['bundle']}\n"
-            await interaction.response.send_message(content=response)
+            embed_response = BotResponseFormatter.crafter_formatter(crafting_rotation)
+            await interaction.response.send_message(embeds=embed_response)
         else:
-            await interaction.response.send_message(content=f"Error: Unable to retrieve crafting rotation, please try again.")
+            await interaction.response.send_message(
+                content=f"Error: Unable to retrieve crafting rotation, please try again.")
 
     @app_commands.command(name="news", description="Displays most recent Apex Legends news.")
     async def news(self, interaction: discord.Interaction):
@@ -54,7 +39,8 @@ class GameInfoCommands(commands.Cog):
         if game_news is not None:
             await interaction.response.send_message(content=game_news[0]['title'])
         else:
-            await interaction.response.send_message(content=f"Error: Unable to retrieve current game news, please try again.")
+            await interaction.response.send_message(
+                content=f"Error: Unable to retrieve current game news, please try again.")
 
     @app_commands.command(name="server", description="Displays Apex Legends server status.")
     async def server(self, interaction: discord.Interaction):

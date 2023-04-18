@@ -8,9 +8,10 @@ class Client(commands.Bot):
         intents = discord.Intents.default()
         intents.members = True
         intents.message_content = True
+        description = '''A Discord bot meant to display a given Apex Legends accounts stats, as well as game info 
+    relating to the store or map rotations.'''
         super().__init__(command_prefix='!',
-                         description='''A Discord bot meant to display a given Apex Legends accounts stats, as well as game info 
-    relating to the store or map rotations.''',
+                         description=description,
                          intents=intents)
 
         self.cogs_list = ["cogs.game_info_commands", "cogs.bot_help_commands", "cogs.player_commands"]
