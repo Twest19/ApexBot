@@ -32,13 +32,6 @@ class PlayerCommands(commands.Cog):
                                   title="Error:",
                                   description=f"unable to find stats for {player_name}. Try again later")
             await interaction.response.send_message(embed=embed)
-        # if player_stats is not None:
-        #     embed_response = BotResponseFormatter.player_stats_formatter(player_stats)
-        #     await interaction.response.send_message(embed=embed_response)
-        #     # Sends the retrieved response back to the discord channel
-        # else:
-        #     await interaction.response.send_message(
-        #         content=f"Unable to find stats for {player_name}. If on PC try using your Origin name.")
 
     @app_commands.command(name="register", description="WORK IN PROGRESS!", )
     async def register(self, interaction: discord.Interaction, player_name: str, platform: str):
