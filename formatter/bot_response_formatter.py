@@ -4,7 +4,7 @@ from formatter.color_picker import ColorPicker
 
 class BotResponseFormatter:
     @staticmethod
-    def map_formatter(current_maps):
+    def map_formatter(current_maps):  # Creates Embed for Maps command
         br_current = current_maps['battle_royale']['current']['map']
         br_next_map = current_maps['battle_royale']['next']['map']
 
@@ -27,7 +27,7 @@ class BotResponseFormatter:
         return embed
 
     @staticmethod
-    def crafter_formatter(crafting_rotation):
+    def crafter_formatter(crafting_rotation):  # Creates Embed for Crafter command
         embed_title = discord.Embed(color=0x098d8d,
                                     title="Crafting Rotation",
                                     description="Apex Legends current crafting rotation")
@@ -35,18 +35,18 @@ class BotResponseFormatter:
         embeds = [embed_title]
 
         for bundle in crafting_rotation[:2]:
-            for item in bundle['bundleContent']:
-                hex_color = item['itemType']['rarityHex']
+            for item in bundle["bundleContent"]:
+                hex_color = item["itemType"]["rarityHex"]
 
                 # item_name = item['itemType']['name']
-                item_rarity = item['itemType']['rarity']
-                item_image = item['itemType']['asset']
-                item_cost = item['cost']
+                item_rarity = item["itemType"]["rarity"]
+                item_image = item["itemType"]["asset"]
+                item_cost = item["cost"]
 
-                if item_rarity == 'Epic':
+                if item_rarity == "Epic":
                     item_rarity = item_rarity.ljust(16)
 
-                embed = discord.Embed(color=discord.Color.from_str(f'{hex_color}'),
+                embed = discord.Embed(color=discord.Color.from_str(f"{hex_color}"),
                                       description=None,
                                       title=f"{item_rarity}\nCost: {item_cost} ")
 
@@ -59,9 +59,9 @@ class BotResponseFormatter:
         return embeds
 
     @staticmethod
-    def player_stats_formatter(player_stats):
+    def player_stats_formatter(player_stats):  # Creates Embed for Stats command
         p_global = player_stats["global"]
-        platform = p_global["platform"] # PC, X1, PS5
+        platform = p_global["platform"]  # PC, X1, PS5
         level = p_global["level"]
         p_name = p_global["name"]
         next_level = p_global["toNextLevelPercent"]
@@ -101,5 +101,19 @@ class BotResponseFormatter:
         embed.add_field(name="RP", value=f"{rank_score}", inline=True)
 
         # embed.set_footer(text=ban_text)
+
+        return embed
+
+    @staticmethod
+    def news_formatter(game_news):  # Creates Embed for News command
+        title = game_news["title"]
+        image = game_news["img"]
+        description = game_news["short_desc"]
+
+        embed = discord.Embed(color=discord.Color.dark_red(),
+                              title=title,
+                              description=description)
+
+        embed.set_image(url=image)
 
         return embed
