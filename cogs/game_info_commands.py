@@ -3,6 +3,7 @@ from discord.ext import commands
 from apex_api import ApexAPI
 from discord import app_commands
 from formatter.bot_response_formatter import BotResponseFormatter
+from buttons import LinkButtons
 
 
 class GameInfoCommands(commands.Cog):
@@ -32,12 +33,15 @@ class GameInfoCommands(commands.Cog):
             await interaction.response.send_message(
                 content=f"Error: Unable to retrieve crafting rotation, please try again.")
 
-    @app_commands.command(name="news", description="Displays most recent Apex Legends news.")
+    @app_commands.command(name="news",
+                          description="Displays most recent Apex Legends news and old older news with buttons.")
     async def news(self, interaction: discord.Interaction):
         game_news = self.apex_api.game_news()
 
         if game_news is not None:
-            await interaction.response.send_message(content=game_news[0]['title'])
+            embed_response = BotResponseFormatter.news_formatter(game_news[0])
+            view = LinkButtons(game_news, 0)
+            await interaction.response.send_message(embed=embed_response, view=view)
         else:
             await interaction.response.send_message(
                 content=f"Error: Unable to retrieve current game news, please try again.")
@@ -66,147 +70,3 @@ class GameInfoCommands(commands.Cog):
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(GameInfoCommands(bot))
-
-
-
-# {
-#     "battle_royale": {
-#         "current": {
-#             "start": 1681770600,
-#             "end": 1681774200,
-#             "readableDate_start": "2023-04-17 22:30:00",
-#             "readableDate_end": "2023-04-17 23:30:00",
-#             "map": "Storm Point",
-#             "code": "storm_point_rotation",
-#             "DurationInSecs": 3600,
-#             "DurationInMinutes": 60,
-#             "asset": "https:\/\/apexlegendsstatus.com\/assets\/maps\/Storm_Point.png",
-#             "remainingSecs": 2826,
-#             "remainingMins": 47,
-#             "remainingTimer": "00:47:06"
-#         },
-#         "next": {
-#             "start": 1681774200,
-#             "end": 1681777800,
-#             "readableDate_start": "2023-04-17 23:30:00",
-#             "readableDate_end": "2023-04-18 00:30:00",
-#             "map": "Broken Moon",
-#             "code": "broken_moon_rotation",
-#             "DurationInSecs": 3600,
-#             "DurationInMinutes": 60,
-#             "asset": "https:\/\/apexlegendsstatus.com\/assets\/maps\/Broken_Moon.png"
-#         }
-#     },
-#     "arenas": {
-#         "current": {
-#             "start": 1681770600,
-#             "end": 1681771500,
-#             "readableDate_start": "2023-04-17 22:30:00",
-#             "readableDate_end": "2023-04-17 22:45:00",
-#             "map": "Drop Off",
-#             "code": "arenas_composite",
-#             "DurationInSecs": 900,
-#             "DurationInMinutes": 15,
-#             "asset": "https:\/\/apexlegendsstatus.com\/assets\/maps\/Arenas_Dropoff.png",
-#             "remainingSecs": 126,
-#             "remainingMins": 2,
-#             "remainingTimer": "00:02:06"
-#         },
-#         "next": {
-#             "start": 1681771500,
-#             "end": 1681772400,
-#             "readableDate_start": "2023-04-17 22:45:00",
-#             "readableDate_end": "2023-04-17 23:00:00",
-#             "map": "Encore",
-#             "code": "arenas_encore",
-#             "DurationInSecs": 900,
-#             "DurationInMinutes": 15,
-#             "asset": "https:\/\/apexlegendsstatus.com\/assets\/maps\/Arena_Encore.png"
-#         }
-#     },
-#     "ranked": {
-#         "current": {
-#             "start": 1681750800,
-#             "end": 1681837200,
-#             "readableDate_start": "2023-04-17 17:00:00",
-#             "readableDate_end": "2023-04-18 17:00:00",
-#             "map": "Broken Moon",
-#             "code": "broken_moon_rotation",
-#             "DurationInSecs": 86400,
-#             "DurationInMinutes": 1440,
-#             "asset": "https:\/\/apexlegendsstatus.com\/assets\/maps\/Broken_Moon.png",
-#             "remainingSecs": 65826,
-#             "remainingMins": 1097,
-#             "remainingTimer": "18:17:06"
-#         },
-#         "next": {
-#             "start": 1681837200,
-#             "end": 1681923600,
-#             "readableDate_start": "2023-04-18 17:00:00",
-#             "readableDate_end": "2023-04-19 17:00:00",
-#             "map": "Olympus",
-#             "code": "olympus_rotation",
-#             "DurationInSecs": 86400,
-#             "DurationInMinutes": 1440,
-#             "asset": "https:\/\/apexlegendsstatus.com\/assets\/maps\/Olympus.png"
-#         }
-#     },
-#     "arenasRanked": {
-#         "current": {
-#             "start": 1681770600,
-#             "end": 1681771500,
-#             "readableDate_start": "2023-04-17 22:30:00",
-#             "readableDate_end": "2023-04-17 22:45:00",
-#             "map": "Drop Off",
-#             "code": "arenas_composite",
-#             "DurationInSecs": 900,
-#             "DurationInMinutes": 15,
-#             "asset": "https:\/\/apexlegendsstatus.com\/assets\/maps\/Arenas_Dropoff.png",
-#             "remainingSecs": 126,
-#             "remainingMins": 2,
-#             "remainingTimer": "00:02:06"
-#         },
-#         "next": {
-#             "start": 1681771500,
-#             "end": 1681772400,
-#             "readableDate_start": "2023-04-17 22:45:00",
-#             "readableDate_end": "2023-04-17 23:00:00",
-#             "map": "Encore",
-#             "code": "arenas_encore",
-#             "DurationInSecs": 900,
-#             "DurationInMinutes": 15,
-#             "asset": "https:\/\/apexlegendsstatus.com\/assets\/maps\/Arena_Encore.png"
-#         }
-#     },
-#     "ltm": {
-#         "current": {
-#             "start": 1681770600,
-#             "end": 1681771500,
-#             "readableDate_start": "2023-04-17 22:30:00",
-#             "readableDate_end": "2023-04-17 22:45:00",
-#             "map": "Skulltown",
-#             "code": "freedm_tdm_skulltown",
-#             "DurationInSecs": 900,
-#             "DurationInMinutes": 15,
-#             "isActive": true,
-#             "eventName": "TDM",
-#             "asset": "https:\/\/apexlegendsstatus.com\/assets\/maps\/",
-#             "remainingSecs": 126,
-#             "remainingMins": 2,
-#             "remainingTimer": "00:02:06"
-#         },
-#         "next": {
-#             "start": 1681771500,
-#             "end": 1681772400,
-#             "readableDate_start": "2023-04-17 22:45:00",
-#             "readableDate_end": "2023-04-17 23:00:00",
-#             "map": "Estates",
-#             "code": "freedm_gungame_estates",
-#             "DurationInSecs": 900,
-#             "DurationInMinutes": 15,
-#             "isActive": true,
-#             "eventName": "Gun Run",
-#             "asset": "https:\/\/apexlegendsstatus.com\/assets\/maps\/"
-#         }
-#     }
-# }
