@@ -45,6 +45,8 @@ class BotResponseFormatter:
 
                 if item_rarity == "Epic":
                     item_rarity = item_rarity.ljust(16)
+                elif item_rarity == "Rare":
+                    item_rarity = item_rarity.ljust(15)
 
                 embed = discord.Embed(color=discord.Color.from_str(f"{hex_color}"),
                                       description=None,
