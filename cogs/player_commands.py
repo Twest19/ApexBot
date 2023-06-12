@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from apex_api import ApexAPI
 from formatter.bot_response_formatter import BotResponseFormatter
+from player import Player
 
 
 class PlayerCommands(commands.Cog):
@@ -36,13 +37,15 @@ class PlayerCommands(commands.Cog):
     @app_commands.command(name="register", description="WORK IN PROGRESS!", )
     async def register(self, interaction: discord.Interaction, player_name: str, platform: str):
         name_uid = self.apex_api.name_to_uid(player_name, platform)
-        # Add discord id, uid, platform to database. Then cogs can be used without needing to type name
-        # consider just an SQLLite DB
 
+        # Add discord id, apex id, platform to database. Then cogs can be used without needing to type name
         if name_uid is not None:
-            uid = name_uid['uid']
+            apex_uid = name_uid['uid']
+            discord_id = interaction.user.id
+            new_player = Player(discord_id, apex_uid, platform)
+            self.bot.database.insert_player(new_player)
             await interaction.response.send_message(
-                content=f'Success! uid {uid} was added for {player_name} on {platform}')
+                content=f'Success! uid {apex_uid} was added for {player_name} on {platform}')
         else:
             await interaction.response.send_message(
                 content=f"Unable to register {player_name}. Check name and try again.")

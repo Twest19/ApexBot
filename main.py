@@ -1,10 +1,13 @@
 import os
 import discord
 from discord.ext import commands
+import sqlite3
+from bot_db import BotDatabase
 
 
 class Client(commands.Bot):
-    def __init__(self):
+    def __init__(self, database):
+        self.database = database
         intents = discord.Intents.default()
         intents.members = True
         intents.message_content = True
@@ -29,7 +32,20 @@ class Client(commands.Bot):
 
 
 if __name__ == "__main__":
-    client = Client()
-    client.remove_command('help')
-    TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
-    client.run(TOKEN)
+    conn = None
+    try:
+        # Create Database Connection and cursor
+        conn = sqlite3.connect('the_apex_bot.db')
+        c = conn.cursor()
+
+        # Get our Database Interface
+        db = BotDatabase(conn, c)
+
+        # Create discord bot client
+        client = Client(db)
+        client.remove_command('help')
+        TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
+        client.run(TOKEN)
+    finally:
+        # Closes database connection
+        conn.close()

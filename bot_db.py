@@ -1,9 +1,8 @@
-import sqlite3
 from sqlite3 import IntegrityError
-from player import Player
 
 
 class BotDatabase:
+    """Database commands for the discord bot. Uses a 'Player' type for inputs"""
     def __init__(self, conn, cursor):
         self.conn = conn
         self.c = cursor
@@ -13,6 +12,7 @@ class BotDatabase:
             with self.conn:
                 self.c.execute("INSERT INTO player VALUES (:discord, :apex, :platform)",
                           {'discord': player.discord_id, 'apex': player.apex_id, 'platform': player.platform})
+            print("SUCCESS!!")
         except IntegrityError:
             # This Discord ID is already in the DB, only want one Discord ID assigned to one Apex Account
             # This will update the player instead
