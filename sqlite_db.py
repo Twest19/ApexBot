@@ -2,10 +2,10 @@ import sqlite3
 from sqlite3 import IntegrityError
 from player import Player
 
-# conn = sqlite3.connect('the_apex_bot.db')
-#
-# c = conn.cursor()
-#
+conn = sqlite3.connect('the_apex_bot.db')
+
+c = conn.cursor()
+
 # c.execute("""CREATE TABLE player (
 #             discordID TEXT UNIQUE,
 #             apexID TEXT,
@@ -33,14 +33,14 @@ from player import Player
 #
 # conn.commit()
 
-# c.execute("DELETE FROM player")
+c.execute("DELETE FROM player")
 
 # c.execute("SELECT * FROM player WHERE platform=:platform", {'platform': 'PS5'})
-# c.execute("SELECT * FROM player")
+c.execute("SELECT * FROM player")
 #
-# print(c.fetchall())
-#
-# conn.commit()
-# conn.close()
+print(c.fetchall())
+
+conn.commit()
+conn.close()
 
 

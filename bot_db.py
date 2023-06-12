@@ -26,13 +26,14 @@ class BotDatabase:
                       {'discord': player.discord_id, 'new_apex': player.apex_id, 'new_platform': player.platform})
 
     def get_player_by_discord_id(self, player):
-        self.c.execute("SELECT * FROM player WHERE discordID=:discord", {'discord': player.discord_id})
+        self.c.execute("SELECT * FROM player WHERE discordID=:discord", {'discord': player})
         return self.c.fetchone()
 
     def get_player_apex_id(self, player):
-        self.c.execute("SELECT apexID FROM player WHERE discordID=:discord", {'discord': player.discord_id})
+        self.c.execute("SELECT apexID, platform FROM player WHERE discordID=:discord", {'discord': player})
+        print("Works!")
         return self.c.fetchone()
 
     def delete_player(self, player):
         with self.conn:
-            self.c.execute("DELETE FROM player WHERE discordID=:discord", {'discord': player.discord_id})
+            self.c.execute("DELETE FROM player WHERE discordID=:discord", {'discord': player})
