@@ -3,6 +3,10 @@ __pycache__/*
 *.py[cod]
 *$py.class
 
+# SQLite DB
+the_apex_bot.db
+
+
 # C extensions
 *.so
 
