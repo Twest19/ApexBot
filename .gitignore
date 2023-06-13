@@ -5,7 +5,7 @@ __pycache__/*
 
 # SQLite DB
 the_apex_bot.db
-
+sqlite_db.py
 
 # C extensions
 *.so
