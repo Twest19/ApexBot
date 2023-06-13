@@ -3,6 +3,7 @@ from discord.ext import commands
 from apex_api import ApexAPI
 from discord import app_commands
 from formatter.bot_response_formatter import BotResponseFormatter
+from formatter.default_images import DefaultApexImg
 from buttons import LinkButtons
 
 
@@ -10,11 +11,12 @@ class GameInfoCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.apex_api = ApexAPI()
+        self.img = DefaultApexImg()
 
     @app_commands.command(name="map", description="Displays the current map rotation.")
     async def maps(self, interaction: discord.Interaction):
         embed = discord.Embed(color=0xff0000, title="Map Rotation", description="Apex Legends current map rotation")
-        embed.set_thumbnail(url="https://i.imgur.com/pdS1ONm.png")
+        embed.set_thumbnail(url=self.img)
 
         current_maps = self.apex_api.map_rotation()
 
@@ -52,18 +54,19 @@ class GameInfoCommands(commands.Cog):
 
         game_news = self.apex_api.game_news()
 
-        if game_news is not None and "title" in game_news:
+        if game_news is not None and "title" in game_news[0]:
             embed_response = BotResponseFormatter.news_formatter(game_news[0], embed)
             view = LinkButtons(game_news, 0)
             await interaction.response.send_message(embed=embed_response, view=view)
         else:
             embed.description = "News currently Unavailable"
-            embed.set_thumbnail(url="https://i.imgur.com/pdS1ONm.png")
+            embed.set_thumbnail(url=self.img)
             await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="server", description="Displays Apex Legends server status.")
     async def server(self, interaction: discord.Interaction):
         embed = discord.Embed(color=0x098d8d, title="Server Status", url="https://apexlegendsstatus.com")
+        embed.set_thumbnail(url=self.img)
 
         server_status = self.apex_api.server_status()
 
