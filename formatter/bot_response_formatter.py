@@ -130,6 +130,5 @@ class BotResponseFormatter:
         embed.add_field(name="**Playstation**", value=f"{playstation}", inline=False)
         embed.add_field(name="**EA Accounts**", value=f"{accounts}", inline=False)
         embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="Url", url="https://apexlegendsstatus.com")
 
         return embed

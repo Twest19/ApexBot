@@ -63,7 +63,7 @@ class GameInfoCommands(commands.Cog):
 
     @app_commands.command(name="server", description="Displays Apex Legends server status.")
     async def server(self, interaction: discord.Interaction):
-        embed = discord.Embed(color=0x098d8d, title="Server Status")
+        embed = discord.Embed(color=0x098d8d, title="Server Status", url="https://apexlegendsstatus.com")
 
         server_status = self.apex_api.server_status()
 
