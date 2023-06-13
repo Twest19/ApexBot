@@ -16,8 +16,7 @@ class GameInfoCommands(commands.Cog):
     @app_commands.command(name="map", description="Displays the current map rotation.")
     async def maps(self, interaction: discord.Interaction):
         embed = discord.Embed(color=0xff0000, title="Map Rotation", description="Apex Legends current map rotation")
-        embed.set_thumbnail(url=self.img)
-
+        embed.set_thumbnail(url=self.img.gibby())
         current_maps = self.apex_api.map_rotation()
 
         if current_maps is not None:
@@ -66,7 +65,7 @@ class GameInfoCommands(commands.Cog):
     @app_commands.command(name="server", description="Displays Apex Legends server status.")
     async def server(self, interaction: discord.Interaction):
         embed = discord.Embed(color=0x098d8d, title="Server Status", url="https://apexlegendsstatus.com")
-        embed.set_thumbnail(url=self.img)
+        embed.set_thumbnail(url=self.img.gibby())
 
         server_status = self.apex_api.server_status()
 

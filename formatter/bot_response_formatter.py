@@ -1,5 +1,6 @@
 import discord
 from formatter.color_picker import ColorPicker
+from formatter.default_images import DefaultApexImg
 
 
 class BotResponseFormatter:
@@ -24,7 +25,6 @@ class BotResponseFormatter:
         embed.add_field(name="BR Current:", value=br_current, inline=True)
         embed.add_field(name="BR Next:", value=br_next_map, inline=True)
         embed.add_field(name="\u200b", value="\u200b", inline=True)
-
         return embed
 
     @staticmethod
@@ -129,6 +129,5 @@ class BotResponseFormatter:
         embed.add_field(name="**Xbox**", value=f"{xbox}", inline=False)
         embed.add_field(name="**Playstation**", value=f"{playstation}", inline=False)
         embed.add_field(name="**EA Accounts**", value=f"{accounts}", inline=False)
-        embed.add_field(name="\u200b", value="\u200b", inline=False)
 
         return embed
