@@ -41,6 +41,9 @@ if __name__ == "__main__":
         # Get our Database Interface
         db = BotDatabase(conn, c)
 
+        # Ensure DB exist
+        db.ensure()
+
         # Create discord bot client
         client = Client(db)
         client.remove_command('help')
@@ -48,4 +51,5 @@ if __name__ == "__main__":
         client.run(TOKEN)
     finally:
         # Closes database connection
-        conn.close()
+        if conn:
+            conn.close()
