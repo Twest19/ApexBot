@@ -18,4 +18,3 @@ class ColorPicker:
             return "FF0000"
         else:
             return "FF0000"
-        

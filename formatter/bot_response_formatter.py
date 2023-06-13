@@ -4,76 +4,56 @@ from formatter.color_picker import ColorPicker
 
 class BotResponseFormatter:
     @staticmethod
-    def map_formatter(current_maps):  # Creates Embed for Maps command
-        embed = discord.Embed(color=0xff0000, title="Map Rotation", description="Apex Legends current map rotation")
-        embed.set_thumbnail(url="https://i.imgur.com/pdS1ONm.png")
+    def map_formatter(current_maps, embed):  # Creates Embed for Maps command
 
-        try:
-            ranked_map = current_maps['ranked']['current']['map']
-            ranked_image_url = current_maps['ranked']['current']['asset']
+        ranked_map = current_maps.get("ranked", {}).get("current", {}).get("map", "Data currently unavailable")
+        ranked_image_url = current_maps.get("ranked", {}).get("current", {}).get("asset", None)
+        ranked_map_timer = current_maps.get("ranked", {}).get("current", {}).get("remainingTimer",
+                                                                                 "Data currently unavailable")
+        ranked_next = current_maps.get("ranked", {}).get("next", {}).get("map", "Data currently unavailable")
 
-            ranked_map_timer = current_maps['ranked']['current']['remainingTimer']
-            ranked_next = current_maps['ranked']['next']['map']
+        embed.add_field(name="Ranked:", value=ranked_map, inline=True)
+        embed.add_field(name="Ranked Next:", value=ranked_next, inline=True)
+        embed.add_field(name="Time Remaining:", value=ranked_map_timer, inline=True)
+        if ranked_image_url:
+            embed.set_image(url=ranked_image_url)
 
-            embed.add_field(name="Ranked:", value=f"{ranked_map}", inline=True)
-            embed.add_field(name="Ranked Next:", value=f"{ranked_next}", inline=True)
-            embed.add_field(name="Time Remaining:", value=f"{ranked_map_timer}", inline=True)
-            embed.set_image(url=f"{ranked_image_url}")
-        except KeyError:
-            embed.add_field(name="Ranked:", value="Data currently unavailable", inline=True)
-            embed.add_field(name="Ranked Next:", value="Data currently unavailable", inline=True)
-            embed.add_field(name="Time Remaining:", value="Data currently unavailable", inline=True)
+        br_current = current_maps.get("battle_royale", {}).get("current", {}).get("map", "Data currently unavailable")
+        br_next_map = current_maps.get("battle_royale", {}).get("next", {}).get("map", "Data currently unavailable")
 
-        try:
-            br_current = current_maps['battle_royale']['current']['map']
-            br_next_map = current_maps['battle_royale']['next']['map']
-
-            embed.add_field(name="BR Current:", value=f"{br_current}", inline=True)
-            embed.add_field(name="BR Next:", value=f"{br_next_map}", inline=True)
-            embed.add_field(name="\u200b", value="\u200b", inline=True)
-        except KeyError:
-            embed.add_field(name="BR Current:", value="Data currently unavailable", inline=True)
-            embed.add_field(name="BR Next:", value="Data currently unavailable", inline=True)
+        embed.add_field(name="BR Current:", value=br_current, inline=True)
+        embed.add_field(name="BR Next:", value=br_next_map, inline=True)
+        embed.add_field(name="\u200b", value="\u200b", inline=True)
 
         return embed
 
     @staticmethod
-    def crafter_formatter(crafting_rotation):  # Creates Embed for Crafter command
-        embed_title = discord.Embed(color=0x098d8d,
-                                    title="Crafting Rotation",
-                                    description="Apex Legends current crafting rotation")
+    def crafter_formatter(crafting_rotation, embed_title):  # Creates Embed for Crafter command
 
         embeds = [embed_title]
 
-        if crafting_rotation is not None:
-            for bundle in crafting_rotation[:2]:
-                for item in bundle["bundleContent"]:
-                    hex_color = item["itemType"]["rarityHex"]
+        for bundle in crafting_rotation[:2]:
+            for item in bundle["bundleContent"]:
+                hex_color = item["itemType"]["rarityHex"]
 
-                    # item_name = item['itemType']['name']
-                    item_rarity = item["itemType"]["rarity"]
-                    item_image = item["itemType"]["asset"]
-                    item_cost = item["cost"]
+                # item_name = item['itemType']['name']
+                item_rarity = item["itemType"]["rarity"]
+                item_image = item["itemType"]["asset"]
+                item_cost = item["cost"]
 
-                    if item_rarity == "Epic":
-                        item_rarity = item_rarity.ljust(16)
-                    elif item_rarity == "Rare":
-                        item_rarity = item_rarity.ljust(15)
+                if item_rarity == "Epic":
+                    item_rarity = item_rarity.ljust(16)
+                elif item_rarity == "Rare":
+                    item_rarity = item_rarity.ljust(15)
 
-                    embed = discord.Embed(color=discord.Color.from_str(f"{hex_color}"),
-                                          description=None,
-                                          title=f"{item_rarity}\nCost: {item_cost} ")
+                embed = discord.Embed(color=discord.Color.from_str(f"{hex_color}"),
+                                      description=None,
+                                      title=f"{item_rarity}\nCost: {item_cost} ")
 
-                    embed.set_thumbnail(url=item_image)
-                    # embed.set_image(url=item_image)
-                    embed.image.width = 10
-                    embed.image.height = 10
-                    embeds.append(embed)
-        else:
-            embed_title.add_field(name="**Error**",
-                                  value="Crafting rotation, currently unavailable. "
-                                        "Check `/server` for potential Apex Legends issues and try again later.",
-                                  inline=False)
+                embed.set_thumbnail(url=item_image)
+                embed.image.width = 10
+                embed.image.height = 10
+                embeds.append(embed)
 
         return embeds
 
@@ -124,22 +104,32 @@ class BotResponseFormatter:
         return embed
 
     @staticmethod
-    def news_formatter(game_news):  # Creates Embed for News command
+    def news_formatter(game_news, embed):  # Creates Embed for News command
 
-        if game_news is not None and "title" in game_news:
-            title = game_news["title"]
-            image = game_news["img"]
-            description = game_news["short_desc"]
+        title = game_news["title"]
+        image = game_news["img"]
+        description = game_news["short_desc"]
 
-            embed = discord.Embed(color=discord.Color.dark_red(),
-                                  title=title,
-                                  description=description)
+        embed.title = title
+        embed.description = description
+        embed.set_image(url=image)
+        return embed
 
-            embed.set_image(url=image)
-            return embed
-        else:
-            embed = discord.Embed(color=discord.Color.dark_red(),
-                                  title="Apex News",
-                                  description="News currently Unavailable")
-            embed.set_thumbnail(url="https://i.imgur.com/pdS1ONm.png")
-            return embed
+    @staticmethod
+    def server_formatter(server_status, embed):
+
+        us_central = server_status.get("Origin_login", {}).get("US-Central", {}).get("Status", "Not Available.")
+        accounts = server_status.get("EA_accounts", {}).get("US-Central", {}).get("Status", "Not Available.")
+        playstation = server_status.get("otherPlatforms", {}).get("Playstation-Network", {}).get("Status",
+                                                                                                 "Not Available.")
+        xbox = server_status.get("otherPlatforms", {}).get("Xbox-Live", {}).get("Status", "Not Available.")
+
+        embed.add_field(name="**Origin:**", value="\u200b", inline=True)
+        embed.add_field(name="**US-Central**", value=f"{us_central}", inline=False)
+        embed.add_field(name="**Xbox**", value=f"{xbox}", inline=False)
+        embed.add_field(name="**Playstation**", value=f"{playstation}", inline=False)
+        embed.add_field(name="**EA Accounts**", value=f"{accounts}", inline=False)
+        embed.add_field(name="\u200b", value="\u200b", inline=False)
+        embed.add_field(name="Url", url="https://apexlegendsstatus.com")
+
+        return embed
