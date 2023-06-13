@@ -15,16 +15,31 @@ class LinkButtons(discord.ui.View):
 
     @discord.ui.button(label="Previous", style=discord.ButtonStyle.primary, custom_id="prev_button")
     async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if self.current_index > 0:
+        if self.current_index == 0:
+            button.disabled = True
+        else:
+            button.disabled = False
+
+        print(button.disabled)
+
+        if not button.disabled and self.current_index >= 1:
             self.current_index -= 1
             embed_resp = BotResponseFormatter.news_formatter(game_news=self.game_news[self.current_index],
                                                              embed=self.embed)
             self.link_button.url = self.game_news[self.current_index]["link"]
             await interaction.response.edit_message(embed=embed_resp, view=self)
+        else:
+            button.disabled = False
+            await interaction.response.edit_message(view=self)
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, custom_id="next_button")
     async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.current_index < len(self.game_news) - 1:
+            button.disabled = False
+        else:
+            button.disabled = True
+
+        if not button.disabled:
             self.current_index += 1
             print(self.current_index)
             embed = BotResponseFormatter.news_formatter(game_news=self.game_news[self.current_index],
@@ -32,3 +47,6 @@ class LinkButtons(discord.ui.View):
             self.link_button.url = self.game_news[self.current_index]["link"]
             print(self.link_button.url)
             await interaction.response.edit_message(embed=embed, view=self)
+        else:
+            button.disabled = False
+            await interaction.response.edit_message(view=self)
