@@ -56,7 +56,7 @@ class GameInfoCommands(commands.Cog):
 
         if game_news is not None and "title" in game_news[0]:
             embed_response = BotResponseFormatter.news_formatter(game_news[0], embed)
-            view = LinkButtons(game_news, 0)
+            view = LinkButtons(game_news, 0, embed)
             await interaction.response.send_message(embed=embed_response, view=view)
         else:
             embed.description = "News currently Unavailable"
