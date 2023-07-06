@@ -1,6 +1,7 @@
 import os
 import requests
 from apex_error import ApexError
+from apex_exception import ApexException
 
 
 class ApexAPI:
@@ -68,4 +69,5 @@ class ApexAPI:
         if code == 200:
             return response.json()
         else:
-            return f"Request failed with status code {code}: {self.api_error.meaning(code)}"
+            # return f"Request failed with status code {code}: {self.api_error.meaning(code)}"
+            raise ApexException(code)

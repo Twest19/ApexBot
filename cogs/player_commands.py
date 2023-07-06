@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from apex_api import ApexAPI
+from apex_exception import ApexException
 from formatter.bot_response_formatter import BotResponseFormatter
 from formatter.default_images import DefaultApexImg
 from player import Player
@@ -13,7 +14,7 @@ class PlayerCommands(commands.Cog):
         self.apex_api = ApexAPI()
         self.img = DefaultApexImg()
 
-    """Command for unregistered users or to find other players stats."""
+    """Command for unregistered users or to search players stats."""
     @app_commands.command(name="search_stats", description="Search a player on of PC, X1, or PS4 and display their "
                                                            "stats")
     @app_commands.describe(platform="Platforms to choose from:")
@@ -26,17 +27,16 @@ class PlayerCommands(commands.Cog):
     async def search_stats(self, interaction: discord.Interaction,
                            player_name: str,
                            platform: discord.app_commands.Choice[int]):
-        # Gets stats for a given player from the Apex Legends API
-        player_stats = self.apex_api.player_data(player_name, platform.name)
-
         try:
+            # Gets stats for a given player from the Apex Legends API
+            player_stats = self.apex_api.player_data(player_name, platform.name)
             embed_response = BotResponseFormatter.player_stats_formatter(player_stats)
             await interaction.response.send_message(embed=embed_response)
             # Sends the retrieved response back to the discord channel
-        except Exception:
+        except ApexException as e:
             embed = discord.Embed(color=discord.Color.dark_red(),
-                                  title="**Error:**",
-                                  description=f"Unable to find stats for {player_name}. \nCheck the `name` and "
+                                  title=f"**Error: {e.code}**",
+                                  description=f"{e.message}\n\n Unable to find stats for {player_name}. \n\nCheck the `name` and "
                                               f"`platform`, then try again...")
             embed.set_thumbnail(url=self.img.gibby())
             await interaction.response.send_message(embed=embed)
@@ -55,49 +55,59 @@ class PlayerCommands(commands.Cog):
 
         embed = discord.Embed(color=0xff0000, title="Registration")
         embed.set_thumbnail(url=self.img.gibby())
+        embeds = [embed]
 
-        print(player_name)
-        name_uid = self.apex_api.name_to_uid(player_name, platform.name)
-        print(name_uid)
-
-        # Add discord id, apex id, platform to database. Then cogs can be used without needing to type name
-        if name_uid is not None and 'uid' in name_uid:
-            apex_uid = name_uid['uid']
+        try:
+            print(player_name)
+            # First need to make sure this a valid apex account, so do a query
+            player = self.apex_api.player_data(player_name, platform.name) # Raises an exception
+            # Add discord id, apex id, platform to database. Then cogs can be used without needing to type name
+            apex_uid = player.get("global", {}).get("uid")
             discord_id = interaction.user.id
-
             new_player = Player(discord_id, apex_uid, platform.name)
 
             if self.bot.database.insert_player(new_player):
+                embed.color = discord.Color.green()
                 embed.add_field(name="**Success!**", value=f"{player_name} registered for {platform.name}! "
-                                                           f"You can now use the `/my commands`.", inline=True)
+                                                           f"You can now use the `/my commands` and "
+                                                           "check out your stats below.", inline=True)
                 embed.add_field(name="\u200b", value="\u200b", inline=True)
-                embed.set_footer(text="Something Wrong? Do `/help` or potential solutions.")
+                embed.set_footer(text="Something Wrong? Do `/help` for potential solutions.")
+                current_stats = BotResponseFormatter().player_stats_formatter(player)
+                embeds.append(current_stats)
             else:
-                embed.add_field(name="**OH NO!**", value=f'Unable to register {player_name}. '
+                embed.add_field(name="**Database Error**", value=f'Unable to register {player_name}. '
                                                          f'Check `name` and `platform`, then try again!')
-        else:
-            embed.add_field(name="**OH NO!**", value=f'Unable to fetch UID for {player_name} from the API. '
-                                                     f'Check `name` and `platform`, then try again!')
-
-        await interaction.response.send_message(embed=embed)
-
+        except ApexException as e:
+            embed.description = f"Unable to register {player_name}."
+            embed.add_field(name=f"**Error {e.code}**", value=f'{e.message}')
+            embed.set_footer(text="Check `name` and `platform`, then try again.")
+        finally:
+            embeds[0] = embed
+            await interaction.response.send_message(embeds=embeds)
+        
     """Command for registered user to get their stats."""
     @app_commands.command(name="my_stats", description="Displays a registered users stats. To register /register")
     async def my_stats(self, interaction: discord.Interaction):
         result = self.bot.database.get_player_apex_id(str(interaction.user.id))
-
+        
         if result is not None:  # Make sure a matching player was found
             apex_id = result[0]
             platform = result[1]
 
-            # Gets stats for a given player from the Apex Legends API
-            player_stats = self.apex_api.uid_data(apex_id, platform)
-            embed = BotResponseFormatter.player_stats_formatter(player_stats)
+            try:
+                # Gets stats for a given player from the Apex Legends API
+                player_stats = self.apex_api.uid_data(apex_id, platform)
+                embed = BotResponseFormatter.player_stats_formatter(player_stats)
+            except ApexException as e:
+                embed = discord.Embed(color=discord.Color.dark_red(),
+                                  title=f"**Error {e.code}**",
+                                  description=f"{e.message}")
         else:
             embed = discord.Embed(color=discord.Color.dark_red(),
                                   title="Error:",
                                   description=f"Looks like you might not be in the database. "
-                                              f"Use the /register command to get registered!")
+                                              f"Use the `/register` command to get registered!")
         # Sends the retrieved response back to the discord channel
         await interaction.response.send_message(embed=embed)
 

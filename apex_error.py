@@ -14,3 +14,5 @@ class ApexError:
     def meaning(self, code):
         if code in self.__error_dict:
             return self.__error_dict[f'{code}']
+        else:
+            return self.__error_dict[f'404']
