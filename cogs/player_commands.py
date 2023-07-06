@@ -58,7 +58,6 @@ class PlayerCommands(commands.Cog):
         embeds = [embed]
 
         try:
-            print(player_name)
             # First need to make sure this a valid apex account, so do a query
             player = self.apex_api.player_data(player_name, platform.name) # Raises an exception
             # Add discord id, apex id, platform to database. Then cogs can be used without needing to type name

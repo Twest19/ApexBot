@@ -21,33 +21,35 @@ class GameInfoCommands(commands.Cog):
 
         try:
             current_maps = self.apex_api.map_rotation()
-            embed_response = BotResponseFormatter.map_formatter(current_maps, embed)
-            await interaction.response.send_message(embed=embed_response)
+            embed = BotResponseFormatter.map_formatter(current_maps, embed)
         except ApexException as e:
             embed.add_field(name=f"**Error: {e.code}**",
                             value=f"{e.message}\n\nUnable to retrieve current map rotation, please try again.", inline=False)
+        finally:            
             await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="crafter", description="Displays current crafting rotation.")
     async def crafter(self, interaction: discord.Interaction):
-        embed_title = discord.Embed(color=0x098d8d,
+        embed = discord.Embed(color=0x098d8d,
                                     title="Crafting Rotation",
                                     description="Apex Legends current crafting rotation")
+        embeds = [embed]
         try:
             crafting_rotation = self.apex_api.crafting_rotation()
-            embed_response = BotResponseFormatter.crafter_formatter(crafting_rotation, embed_title)
-            await interaction.response.send_message(embeds=embed_response)
+            embeds = BotResponseFormatter.crafter_formatter(crafting_rotation, embeds)
         except ApexException as e:
-            embed_title.add_field(name=f"**Error {e.code}**",
+            embed.add_field(name=f"**Error {e.code}**",
                                   value=f"{e.message} \nCrafting rotation, currently unavailable. "
                                         "Check `/server` for potential Apex Legends issues and try again later.",
                                   inline=False)
-            await interaction.response.send_message(embed=embed_title)
+            embeds[0] = embed
+        finally:
+            await interaction.response.send_message(embeds=embeds)
 
     @app_commands.command(name="news",
                           description="Displays most recent Apex Legends news and old older news with buttons.")
     async def news(self, interaction: discord.Interaction):
-        embed = discord.Embed(color=discord.Color.dark_red(),
+        embed = discord.Embed(color=discord.Color.dark_teal(),
                               title="Apex News")
 
         try:
@@ -67,13 +69,28 @@ class GameInfoCommands(commands.Cog):
 
         try: 
             server_status = self.apex_api.server_status()
-            embed_response = BotResponseFormatter.server_formatter(server_status, embed)
-            await interaction.response.send_message(embed=embed_response)
+            embed = BotResponseFormatter.server_formatter(server_status, embed)
         except ApexException as e:
             embed.add_field(name=f"**Error: {e.code}**", value=f"{e.message}\n Apex Servers or API may be down,"
                             "click the link for more info.", inline=True)
-            await interaction.response.send_message(embed)
+        finally:
+            await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name="predator", description="Displays RP needed for predator on all platforms.")
+    async def predator(self, interaction: discord.Interaction):
+        embed = discord.Embed(color=discord.Color.dark_red(), 
+                              title="Predator", 
+                              description="RP needed to reach Apex Predator in BR on all platforms.")
+        embed.set_thumbnail(url=self.img.pred())
+
+        try: 
+            pred_points = self.apex_api.predator()
+            embed = BotResponseFormatter.predator_formatter(pred_points, embed)
+        except ApexException as e:
+            embed.add_field(name=f"**Error: {e.code}**", value=f"{e.message}\n Apex Servers or API may be down,"
+                            "try again later.", inline=True)
+        finally:
+            await interaction.response.send_message(embed=embed)
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(GameInfoCommands(bot))
