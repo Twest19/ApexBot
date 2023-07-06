@@ -59,6 +59,7 @@ class BotResponseFormatter:
 
     @staticmethod
     def player_stats_formatter(player_stats):  # Creates Embed for Stats command
+        print(player_stats)
         p_global = player_stats["global"]
         platform = p_global["platform"]  # PC, X1, PS5
         level = p_global["level"]
@@ -96,7 +97,7 @@ class BotResponseFormatter:
         embed.add_field(name=f"To Next", value=f"{next_level}%", inline=True)
         embed.add_field(name="\u200b", value="\u200b", inline=True)
 
-        embed.add_field(name="S16 Rank", value=f"{player_rank} {player_div}", inline=True)
+        embed.add_field(name="S17 Rank", value=f"{player_rank} {player_div}", inline=True)
         embed.add_field(name="RP", value=f"{rank_score}", inline=True)
 
         # embed.set_footer(text=ban_text)
@@ -105,14 +106,15 @@ class BotResponseFormatter:
 
     @staticmethod
     def news_formatter(game_news, embed):  # Creates Embed for News command
-
-        title = game_news["title"]
-        image = game_news["img"]
-        description = game_news["short_desc"]
-
+        # Api indexing
+        title = game_news.get("title")
+        image = game_news.get("img", None)
+        description = game_news.get("short_desc")
+        # Embed
         embed.title = title
         embed.description = description
-        embed.set_image(url=image)
+        if image is not None:
+            embed.set_image(url=image)
         return embed
 
     @staticmethod

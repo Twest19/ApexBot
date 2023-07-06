@@ -17,4 +17,4 @@ class ColorPicker:
         elif color == "Predator":
             return "FF0000"
         else:
-            return "FF0000"
+            return "FFFFFF"

@@ -13,13 +13,12 @@ class BotDatabase:
             with self.conn:
                 self.c.execute("INSERT INTO player VALUES (:discord, :apex, :platform)",
                                {'discord': player.discord_id, 'apex': player.apex_id, 'platform': player.platform})
-                print("SUCCESS!!")
             return self.c.rowcount > 0
 
         except IntegrityError:
             # This Discord ID is already in the DB, only want one Discord ID assigned to one Apex Account
             # This will update the player instead
-            self.update_player(player)
+            return self.update_player(player)
 
     def update_player(self, player):
         with self.conn:
@@ -35,7 +34,7 @@ class BotDatabase:
 
     def get_player_apex_id(self, player):
         self.c.execute("SELECT apexID, platform FROM player WHERE discordID=:discord", {'discord': player})
-        print("Works!")
+        print("Getting Player...")
         return self.c.fetchone()
 
     def delete_player(self, player):
