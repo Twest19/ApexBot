@@ -44,9 +44,7 @@ class BotResponseFormatter:
         return embed
 
     @staticmethod
-    def crafter_formatter(crafting_rotation, embed_title):  # Creates Embed for Crafter command
-
-        embeds = [embed_title]
+    def crafter_formatter(crafting_rotation, embeds):  # Creates Embed for Crafter command
 
         for bundle in crafting_rotation[:2]:
             for item in bundle["bundleContent"]:
@@ -151,5 +149,43 @@ class BotResponseFormatter:
         embed.add_field(name="**Xbox**", value=f"{xbox}", inline=False)
         embed.add_field(name="**Playstation**", value=f"{playstation}", inline=False)
         embed.add_field(name="**EA Accounts**", value=f"{accounts}", inline=False)
+
+        return embed
+
+    @staticmethod
+    def predator_formatter(predator, embed):
+        pred = predator.get("RP", {})
+        # PC
+        pc = pred.get("PC")
+        pc_val = pc.get("val")
+        pc_total = pc.get("totalMastersAndPreds")
+        # PS4/5
+        ps = pred.get("PS4")
+        ps_val = ps.get("val")
+        ps_total = ps.get("totalMastersAndPreds")
+        # X1
+        xbox = pred.get("X1")
+        xbox_val = xbox.get("val")
+        xbox_total = xbox.get("totalMastersAndPreds")
+        # Switch
+        switch = pred.get("SWITCH")
+        switch_val = switch.get("val")
+        switch_total = switch.get("totalMastersAndPreds")
+        # Embed PC
+        embed.add_field(name="PC", value=f"{pc_val} RP", inline=True)
+        embed.add_field(name="Total Masters and Preds", value=f"{pc_total}", inline=True)
+        embed.add_field(name="\u200b", value="\u200b", inline=True)
+        # Embed PS
+        embed.add_field(name="PS5", value=f"{ps_val} RP", inline=True)
+        embed.add_field(name="Total Masters and Preds", value=f"{ps_total}", inline=True)
+        embed.add_field(name="\u200b", value="\u200b", inline=True)
+        # Embed X1
+        embed.add_field(name="X1", value=f"{xbox_val} RP", inline=True)
+        embed.add_field(name="Total Masters and Preds", value=f"{xbox_total}", inline=True)
+        embed.add_field(name="\u200b", value="\u200b", inline=True)
+        # Embed Switch
+        embed.add_field(name="Switch", value=f"{switch_val} RP", inline=True)
+        embed.add_field(name="Total Masters and Preds", value=f"{switch_total}", inline=True)
+        embed.add_field(name="\u200b", value="\u200b", inline=True)
 
         return embed
