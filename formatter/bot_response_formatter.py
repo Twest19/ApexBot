@@ -6,7 +6,28 @@ from formatter.default_images import DefaultApexImg
 class BotResponseFormatter:
     @staticmethod
     def map_formatter(current_maps, embed):  # Creates Embed for Maps command
+        # Mix tape Current
+        ltm_current_map = current_maps.get("ltm", {}).get("current", {}).get("map", "Data currently unavailable")
+        ltm_current_mode = current_maps.get("ltm", {}).get("current", {}).get("eventName", "Data currently unavailable")
+        ltm_current_timer= current_maps.get("ltm", {}).get("current", {}).get("remainingTimer", "Data currently unavailable")
+        #Mix tape next
+        ltm_next_map = current_maps.get("ltm", {}).get("next", {}).get("map", "Data currently unavailable")
+        ltm_next_mode = current_maps.get("ltm", {}).get("next", {}).get("eventName", "Data currently unavailable")
 
+        embed.add_field(name="Mixtape Current:", value=f"{ltm_current_map} - {ltm_current_mode}", inline=True)
+        embed.add_field(name="Mixtape Next:", value=f"{ltm_next_map} - {ltm_next_mode}", inline=True)
+        embed.add_field(name="Time Remaining:", value=ltm_current_timer, inline=True)
+
+        # Pubs BR
+        br_current = current_maps.get("battle_royale", {}).get("current", {}).get("map", "Data currently unavailable")
+        br_next_map = current_maps.get("battle_royale", {}).get("next", {}).get("map", "Data currently unavailable")
+        br_map_timer = current_maps.get("battle_royale", {}).get("current", {}).get("remainingTimer", "Data currently unavailable")
+
+        embed.add_field(name="BR Current:", value=br_current, inline=True)
+        embed.add_field(name="BR Next:", value=br_next_map, inline=True)
+        embed.add_field(name="Time Remaining:", value=br_map_timer, inline=True)
+        # embed.add_field(name="\u200b", value="\u200b", inline=True)
+        # Ranked BR
         ranked_map = current_maps.get("ranked", {}).get("current", {}).get("map", "Data currently unavailable")
         ranked_image_url = current_maps.get("ranked", {}).get("current", {}).get("asset", None)
         ranked_map_timer = current_maps.get("ranked", {}).get("current", {}).get("remainingTimer",
@@ -19,12 +40,7 @@ class BotResponseFormatter:
         if ranked_image_url:
             embed.set_image(url=ranked_image_url)
 
-        br_current = current_maps.get("battle_royale", {}).get("current", {}).get("map", "Data currently unavailable")
-        br_next_map = current_maps.get("battle_royale", {}).get("next", {}).get("map", "Data currently unavailable")
-
-        embed.add_field(name="BR Current:", value=br_current, inline=True)
-        embed.add_field(name="BR Next:", value=br_next_map, inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=True)
+        embed.set_footer(text="Ranked Maps reset daily at 12PM CST.")
         return embed
 
     @staticmethod
@@ -60,48 +76,52 @@ class BotResponseFormatter:
     @staticmethod
     def player_stats_formatter(player_stats):  # Creates Embed for Stats command
         print(player_stats)
-        p_global = player_stats["global"]
-        platform = p_global["platform"]  # PC, X1, PS5
-        level = p_global["level"]
-        p_name = p_global["name"]
-        next_level = p_global["toNextLevelPercent"]
+        p_global = player_stats.get("global", {})
+        # Basic info name, level, platform
+        platform = p_global.get("platform")  # PC, X1, PS5
+        p_name = p_global.get("name")
+        level = p_global.get("level")
+        next_level = p_global.get("toNextLevelPercent")
+        # Ranked Stats
+        rank = p_global.get("rank")
+        rank_score = rank.get("rankScore")
+        player_rank = rank.get("rankName")
+        player_div = rank.get("rankDiv")
+        player_rank_image = rank.get("rankImg")
+        rank_top_global = rank.get("ALStopPercentGlobal")
+        # BattlePass
+        battle_pass = p_global.get("battlepass").get("level")
 
-        rank = p_global["rank"]
-        player_rank_image = rank["rankImg"]
-        player_rank = rank["rankName"]
-        player_div = rank["rankDiv"]
-        rank_score = rank["rankScore"]
-
-        # ban = p_global["bans"]
-        # ban_info = ban["isActive"]
-        # ban_seconds = ban["remainingSeconds"]
-        # ban_last = ban["last_banReason"]
-        # ban_text = "Ban: "
+        # New Sections - RealTime
+        realtime = player_stats.get("realtime", {})
+        # Lobby
+        player_state = realtime.get("currentStateAsText")
+        # Section - Legends
+        legends = player_stats.get("legends", {})
+        # Legends
+        leg_name = legends.get("selected", {}).get("LegendName")
+        selected_leg_img = legends.get("selected", {}).get("ImgAssets", {}).get("icon")
+        
 
         color = ColorPicker.select(player_rank).upper()
-
-        # if ban_info is True:
-        #     ban_text += f"{ban_last} {ban_seconds}s remaining "
-        # else:
-        #     ban_text += f"NONE  Last Ban: {ban_last}"
-
         embed = discord.Embed(color=discord.Color.from_str(f'#{color}'),
-                              title=f"Stats for {p_name} - {platform}",
-                              description=None)
+                              title=f"__{p_name} - {platform} - LVL {level} - S17 BP {battle_pass}__")
+        
+        if player_state != "Offline":
+            current_state = realtime.get("lobbyState")
+            embed.description = f":green_circle: {player_state} - {current_state} - {leg_name}"
+            embed.set_image(url=selected_leg_img)
+        else:
+            embed.description = f":red_circle: {player_state}"
 
         embed.set_thumbnail(url=player_rank_image)
-        embed.thumbnail.width = 10
-        embed.thumbnail.height = 10
-
-        embed.add_field(name="Level", value=f"{level}", inline=True)
-        embed.add_field(name=f"To Next", value=f"{next_level}%", inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=True)
-
+        embed.thumbnail.width = 15
+        embed.thumbnail.height = 15
+        # Ranked Embeds
         embed.add_field(name="S17 Rank", value=f"{player_rank} {player_div}", inline=True)
         embed.add_field(name="RP", value=f"{rank_score}", inline=True)
-
-        # embed.set_footer(text=ban_text)
-
+        embed.add_field(name="Top Global", value=f"{rank_top_global}%", inline=True)
+        embed.set_footer(text="Stats wrong? Equip the equivalent trackers in game, ie badges.")
         return embed
 
     @staticmethod
