@@ -9,7 +9,7 @@ COMING SOON
 ## Technologies Used
 - **Language:** Python
 - **Library:** ![discord.py](https://discordpy.readthedocs.io/en/stable/)
-- **API:** ![Apex Legends AP](https://apexlegendsapi.com/#introduction)
+- **API:** ![Apex Legends API](https://apexlegendsapi.com/#introduction)
 - **Hosting:** Can be hosted both locally or on a server. My personal use of this bot is hosted on a Digital Ocean Droplet for continuous uptime. Make use of those GitHub Student pack credits!
 
 ## Prerequisites
