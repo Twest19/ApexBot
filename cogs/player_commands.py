@@ -127,7 +127,7 @@ class PlayerCommands(commands.Cog):
                                               f"You must be registered to remove yourself. "
                                               f"Use the `/register` command to get registered!")
         # Sends the retrieved response back to the discord channel
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed)    
 
 
 async def setup(bot: commands.Bot) -> None:
