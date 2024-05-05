@@ -103,7 +103,7 @@ class BotResponseFormatter:
 
         color = ColorPicker.select(player_rank).upper()
         embed = discord.Embed(color=discord.Color.from_str(f'#{color}'),
-                              title=f"__{p_name} - {platform} - LVL {level} - S17 BP {battle_pass}__")
+                              title=f"__{p_name} - {platform} - LVL {level} - S20 BP {battle_pass}__")
         
         if player_state != "Offline":
             current_state = realtime.get("lobbyState")
@@ -116,7 +116,7 @@ class BotResponseFormatter:
         embed.thumbnail.width = 15
         embed.thumbnail.height = 15
         # Ranked Embeds
-        embed.add_field(name="S17 Rank", value=f"{player_rank} {player_div}", inline=True)
+        embed.add_field(name="S20 Rank", value=f"{player_rank} {player_div}", inline=True)
         embed.add_field(name="RP", value=f"{rank_score}", inline=True)
         embed.add_field(name="Top Global", value=f"{rank_top_global}%", inline=True)
         embed.set_footer(text="Stats wrong? Equip the equivalent trackers in game, ie badges.")
